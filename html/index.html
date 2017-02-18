@@ -1,0 +1,130 @@
+<html>
+	<head>
+		<title>Weather Sensors - Home</title> 
+		<script src='angular.min.js'></script>
+		<script src='angular-sanitize.min.js'></script>
+
+	</head>
+	<body background='SunnySunSkySummer.jpg' style='background-size: cover'>
+		<div ng-app='app' ng-controller='sensorData'>
+			<table border='1' style='background-color: white'>	
+				<tr>
+					<td colspan='6' align='center'>
+						<b>Weather Sensor Data</b>
+					</td>
+				<tr>
+					<th>Date/Time
+					<th>Temperature
+					<th>Humidity
+					<th>Daylight
+					<th>Pressure
+					<th>Pressure
+				<tr>
+					<td ng-bind='time'>
+					<td align='center' ng-bind='temp_F'>
+					<td align='center' ng-bind='humidity'>
+					<td align='center' ng-bind='photon'>
+					<td align='center' ng-bind='pressure_pa'>
+					<td align='center' ng-bind='pressure_atm'>
+			</table>
+			<br>
+			<table border='1' style='background-color: white'>	
+				<tr>
+					<td colspan='3' align='center'>
+						<b>Status</b>
+					</td>
+				<tr>
+					<th>Sensors
+					<th>Server
+					<th>LCD
+				<tr>
+					<td ng-bind='status'>
+					<td><button ng-click='shutdown()'>Stop</button></td>
+					<td><button ng-click='toggleLCD()'>On/Off</button></td>
+			</table>
+			<br>
+			<table border='1' style='background-color: white'>	
+				<tr>
+					<td colspan='6' align='center'>
+						<b>Weather Sensor History</b>
+					</td>
+				<tr>
+					<th>Date/Time
+					<th>Temperature
+					<th>Humidity
+					<th>Daylight
+					<th>Pressure
+					<th>Pressure
+				<tr ng-repeat='log in history'>
+					<td ng-bind='log.time'>
+					<td align='center'>{{log.temp_F + 'F'}}
+					<td align='center'>{{log.humidity + '%'}}
+					<td align='center' ng-bind='log.photon'>
+					<td align='center'>{{log.pressure_pa + 'pa'}}
+					<td align='center'>{{log.pressure_atm + 'atm'}}
+			</table>
+			<br>
+			</table>
+		</div>
+		<script>
+			//define angular app
+			var app = angular.module("app",['ngSanitize']);
+			//define controller
+			app.controller('sensorData', function($scope, $sce, $http, $interval){
+				$scope.toggleLCD = function(){
+					$http({
+						method: 'GET',
+						url: '/api/lcd/toggle',
+					});
+				}
+				$scope.shutdown = function(){
+					$http({
+						method: 'GET',
+						url: '/api/shutdown',
+					});
+					//stop polling if server is shutting down
+					$interval.cancel(pollInterval);	//live data
+					$interval.cancel(pollInterval2);//history
+				}
+				var getData = function(){
+                                        $http({
+                                                method: 'GET',
+                                                url: '/api/sensors/all',
+                                        }).then(function success(response){
+						$scope.status = 'Running';
+						var data = response.data;
+						//console.log(data);	//debug
+						$scope.temp_F = data.temp_F + 'F';
+						$scope.humidity = data.humidity + '%';
+						$scope.photon = Boolean(data.photon);
+						$scope.time = data.time;
+						$scope.pressure_pa = data.pressure_pa + 'pa'; 
+						$scope.pressure_atm= data.pressure_atm + 'atm'; 
+                                        },
+					function(error){
+						$scope.status = 'Stopped';	
+					});
+				} 
+				var getHistory = function(){
+                                        $http({
+                                                method: 'GET',
+                                                url: '/api/sensors/db_query',
+                                        }).then(function success(response){
+						$scope.history = response.data;
+					},
+					function(error){
+						$scope.status = 'Stopped';	
+						console.log('Unable to get history data from database.');
+					});
+				}
+				//initialize data from sensors
+				getData();
+				getHistory();
+				//refresh live data every 3 seconds	
+				var pollInterval = $interval(function(){getData()}, 3000);
+				//refresh history every 30 minutes
+				var pollInterval2 = $interval(function(){getHistory()}, 1800000); 
+			});     
+		</script>
+	</body>
+</html>

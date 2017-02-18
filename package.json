@@ -1,0 +1,28 @@
+{
+  "name": "weatherSensors",
+  "version": "0.0.0",
+  "description": "Collects weather data with sensors.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "scroll",
+    "js",
+    "text",
+    "lcd"
+  ],
+  "author": "David Bohannon",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "i2c": "^0.2.3",
+    "lcdi2c": "^1.0.6",
+    "mongodb": "^2.2.21",
+    "node-dht-sensor": "0.0.32",
+    "node-schedule": "^1.2.0",
+    "pi-gpio": "0.0.8",
+    "raspi-sensors": "^0.2.11"
+  }
+}

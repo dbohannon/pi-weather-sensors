@@ -1,0 +1,3 @@
+A NodeJS Raspberry Pi application used to collect weather data.
+To run: node server.js
+To access web interface: http://[IP]:8000
