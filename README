@@ -1,3 +1,14 @@
-A NodeJS Raspberry Pi application used to collect weather data.
+A NodeJS Raspberry Pi application used to collect weather data. This application uses the MEAN stack to accomplish the following:
+MongoDB - log sensor data to a persistent database every 30 minutes
+Express - serve the http interface and sensor APIs
+Angular - render the sensor data (real-time and past 24 hours)
+NodeJS - provide a server-side JavaScript environment
+
+The Raspberry Pi for this project uses the following components:
+DHT11 sensor - temperature and humidity
+I2C 1602 LCD - display
+BMP180 sensor - atmospheric pressure
+Photoresistor - light sensing
+
 To run: node server.js
 To access web interface: http://[IP]:8000
